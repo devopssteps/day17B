@@ -1,29 +1,24 @@
 pipeline {
     agent any
-    environment {
-        IMAGE_NAME = "devopssteps/my-docker-app-17b"
-        IMAGE_TAG = "latest"
-    }
-
 
     stages {
-        
-        stage('Build Docker Image') {
+        stage('Build') {
             steps {
-                script {
-                    //dockerImage = docker.build("myapp:${env.BUILD_NUMBER}")
-                    sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."    
-                }
+                echo 'Building...'
             }
         }
+    }
 
-        stage('Run Container') {
-            steps {
-                script {
-                    //dockerImage.run("-p 5000:5000")
-                     sh "docker run -d -p 5000:5000 --name demo-container ${IMAGE_NAME}:${IMAGE_TAG}" 
-                }
-            }
+    post {
+        success {
+            emailext subject: 'Build SUCCESS: ${JOB_NAME}',
+                     body: 'Job ${JOB_NAME} build #${BUILD_NUMBER} was successful.',
+                     to: 'rajiv19831@gmail.com'
+        }
+        failure {
+            emailext subject: 'Build FAILURE: ${JOB_NAME}',
+                     body: 'Job ${JOB_NAME} build #${BUILD_NUMBER} failed.',
+                     to: 'rajiv19831@gmail.com'
         }
     }
 }
